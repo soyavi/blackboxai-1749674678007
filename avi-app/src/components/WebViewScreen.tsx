@@ -11,7 +11,16 @@ const WebViewScreen = () => {
   useEffect(() => {
     (async () => {
       try {
+        console.log('Solicitando permisos de audio...');
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: true,
+          shouldDuckAndroid: true,
+        });
+        
         const permission = await Audio.requestPermissionsAsync();
+        console.log('Estado del permiso:', permission.status);
         setHasAudioPermission(permission.status === 'granted');
         
         if (permission.status !== 'granted') {
@@ -22,6 +31,10 @@ const WebViewScreen = () => {
         }
       } catch (error) {
         console.error('Error al solicitar permisos de audio:', error);
+        Alert.alert(
+          'Error',
+          'No se pudieron obtener los permisos de audio. Por favor, intenta nuevamente.'
+        );
       }
     })();
   }, []);
@@ -52,8 +65,26 @@ const WebViewScreen = () => {
         />
       )}
       <WebView
-        source={{ uri: 'https://app.loveavi.com' }}
-        onLoadEnd={() => setLoading(false)}
+        source={{ 
+          uri: 'https://app.loveavi.com',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        }}
+        originWhitelist={['*']}
+        sharedCookiesEnabled={true}
+        incognito={false}
+        useWebKit={true}
+        mixedContentMode="compatibility"
+        onNavigationStateChange={(navState) => {
+          console.log('Navigation State:', navState);
+        }}
+        onLoadEnd={() => {
+          setLoading(false);
+          console.log('WebView loaded');
+        }}
+        onLoadStart={() => console.log('WebView starting to load')}
         onMessage={handleMessage}
         javaScriptEnabled={true}
         domStorageEnabled={true}
@@ -66,23 +97,46 @@ const WebViewScreen = () => {
         bounces={false}
         scrollEnabled={true}
         startInLoadingState={true}
-        style={styles.webview}
+        cacheEnabled={false}
+        style={[styles.webview, { backgroundColor: '#ffffff' }]}
         injectedJavaScript={`
+          window.onerror = function(message, source, lineno, colno, error) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'error',
+              message: message,
+              source: source,
+              lineno: lineno,
+              colno: colno,
+              error: error ? error.toString() : null
+            }));
+            return true;
+          };
+          
           window.addEventListener('load', function() {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'load',
+              message: 'Page loaded successfully'
+            }));
+            
             navigator.mediaDevices = navigator.mediaDevices || {};
             navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || 
               navigator.webkitGetUserMedia || 
               navigator.mozGetUserMedia || 
               navigator.msGetUserMedia;
-            true;
           });
+          true;
         `}
         onShouldStartLoadWithRequest={(request) => {
+          console.log('Loading URL:', request.url);
           return true;
         }}
         onError={(syntheticEvent) => {
           const { nativeEvent } = syntheticEvent;
-          console.warn('WebView error: ', nativeEvent);
+          console.warn('WebView error:', nativeEvent);
+        }}
+        onHttpError={(syntheticEvent) => {
+          const { nativeEvent } = syntheticEvent;
+          console.warn('WebView HTTP error:', nativeEvent);
         }}
       />
     </View>
