@@ -50,7 +50,8 @@
           "icon": "./assets/notification-icon.png",
           "color": "#ffffff"
         }
-      ]
+      ],
+      "expo-audio"
     ],
     "extra": {
       "eas": {
