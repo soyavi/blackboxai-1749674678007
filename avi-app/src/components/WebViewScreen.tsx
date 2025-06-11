@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet, Alert, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { getFCMToken, registerTokenOnServer } from '../services/firebase';
-import * as Permissions from 'expo-permissions';
+import { Audio } from 'expo-av';
 
 const WebViewScreen = () => {
   const [loading, setLoading] = useState(true);
@@ -10,21 +10,18 @@ const WebViewScreen = () => {
 
   useEffect(() => {
     (async () => {
-      const { status: existingStatus } = await Permissions.getAsync(Permissions.AUDIO_RECORDING);
-      let finalStatus = existingStatus;
-      
-      if (existingStatus !== 'granted') {
-        const { status } = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
-        finalStatus = status;
-      }
-      
-      setHasAudioPermission(finalStatus === 'granted');
-      
-      if (finalStatus !== 'granted') {
-        Alert.alert(
-          'Permiso requerido',
-          'La aplicación necesita acceso al micrófono para funcionar correctamente.'
-        );
+      try {
+        const permission = await Audio.requestPermissionsAsync();
+        setHasAudioPermission(permission.status === 'granted');
+        
+        if (permission.status !== 'granted') {
+          Alert.alert(
+            'Permiso requerido',
+            'La aplicación necesita acceso al micrófono para funcionar correctamente.'
+          );
+        }
+      } catch (error) {
+        console.error('Error al solicitar permisos de audio:', error);
       }
     })();
   }, []);
