@@ -32,7 +32,23 @@
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>app.soyavi.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSTemporaryExceptionMinimumTLSVersion</key>
+				<string>TLSv1.2</string>
+			</dict>
+		</dict>
 	</dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>La aplicación necesita acceso al micrófono para las funciones de audio</string>
+	<key>NSCameraUsageDescription</key>
+	<string>La aplicación necesita acceso a la cámara para las funciones de video</string>
 	<key>UILaunchStoryboardName</key>
 	<string>SplashScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
