@@ -52,7 +52,7 @@ const WebViewScreen = () => {
         />
       )}
       <WebView
-        source={{ uri: 'http://app.soyavi.com' }}
+        source={{ uri: 'https://app.soyavi.com' }}
         onLoadEnd={() => setLoading(false)}
         onMessage={handleMessage}
         javaScriptEnabled={true}
