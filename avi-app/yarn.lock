@@ -2417,6 +2417,11 @@ expo-notifications@^0.31.3:
     expo-application "~6.1.4"
     expo-constants "~17.1.6"
 
+expo-permissions@^14.4.0:
+  version "14.4.0"
+  resolved "https://registry.yarnpkg.com/expo-permissions/-/expo-permissions-14.4.0.tgz#d7bb2f0026b87e1294ee551969c35306193f4ad3"
+  integrity sha512-oAcnJ7dlZhpBydK73cwomA2xofizayVUz+FW5REl7dMu7MYyeN/3aqhlpZ3mYddrxvG161bqu97MQr01UixUnw==
+
 expo-status-bar@~2.2.3:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/expo-status-bar/-/expo-status-bar-2.2.3.tgz#09385a866732328e0af3b4588c4f349a15fd7cd0"
