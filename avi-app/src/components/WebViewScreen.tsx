@@ -52,7 +52,7 @@ const WebViewScreen = () => {
         />
       )}
       <WebView
-        source={{ uri: 'https://app.soyavi.com' }}
+        source={{ uri: 'https://app.loveavi.com' }}
         onLoadEnd={() => setLoading(false)}
         onMessage={handleMessage}
         javaScriptEnabled={true}
@@ -62,15 +62,28 @@ const WebViewScreen = () => {
         androidHardwareAccelerationDisabled={false}
         allowsRecordingIOS={true}
         allowsFullscreenVideo={true}
+        allowsBackForwardNavigationGestures={true}
+        bounces={false}
+        scrollEnabled={true}
+        startInLoadingState={true}
         style={styles.webview}
         injectedJavaScript={`
-          navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || 
-          navigator.webkitGetUserMedia || 
-          navigator.mozGetUserMedia || 
-          navigator.msGetUserMedia;
-          true;
+          window.addEventListener('load', function() {
+            navigator.mediaDevices = navigator.mediaDevices || {};
+            navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || 
+              navigator.webkitGetUserMedia || 
+              navigator.mozGetUserMedia || 
+              navigator.msGetUserMedia;
+            true;
+          });
         `}
-        onShouldStartLoadWithRequest={() => true}
+        onShouldStartLoadWithRequest={(request) => {
+          return true;
+        }}
+        onError={(syntheticEvent) => {
+          const { nativeEvent } = syntheticEvent;
+          console.warn('WebView error: ', nativeEvent);
+        }}
       />
     </View>
   );
