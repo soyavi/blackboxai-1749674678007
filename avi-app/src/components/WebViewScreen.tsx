@@ -1,10 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet, Alert, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { getFCMToken, registerTokenOnServer } from '../services/firebase';
+import * as Permissions from 'expo-permissions';
 
 const WebViewScreen = () => {
   const [loading, setLoading] = useState(true);
+  const [hasAudioPermission, setHasAudioPermission] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { status: existingStatus } = await Permissions.getAsync(Permissions.AUDIO_RECORDING);
+      let finalStatus = existingStatus;
+      
+      if (existingStatus !== 'granted') {
+        const { status } = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
+        finalStatus = status;
+      }
+      
+      setHasAudioPermission(finalStatus === 'granted');
+      
+      if (finalStatus !== 'granted') {
+        Alert.alert(
+          'Permiso requerido',
+          'La aplicación necesita acceso al micrófono para funcionar correctamente.'
+        );
+      }
+    })();
+  }, []);
 
   const handleMessage = async (event: any) => {
     try {
@@ -39,7 +62,18 @@ const WebViewScreen = () => {
         domStorageEnabled={true}
         allowsInlineMediaPlayback={true}
         mediaPlaybackRequiresUserAction={false}
+        androidHardwareAccelerationDisabled={false}
+        allowsRecordingIOS={true}
+        allowsFullscreenVideo={true}
         style={styles.webview}
+        injectedJavaScript={`
+          navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || 
+          navigator.webkitGetUserMedia || 
+          navigator.mozGetUserMedia || 
+          navigator.msGetUserMedia;
+          true;
+        `}
+        onShouldStartLoadWithRequest={() => true}
       />
     </View>
   );
