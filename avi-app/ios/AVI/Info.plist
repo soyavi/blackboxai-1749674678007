@@ -34,7 +34,7 @@
 		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>facebook.com</key>
+			<key>soyavii.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
