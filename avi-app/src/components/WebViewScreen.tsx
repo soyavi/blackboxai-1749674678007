@@ -66,7 +66,7 @@ const WebViewScreen = () => {
       )}
       <WebView
         source={{ 
-          uri: 'https://www.facebook.com',
+          uri: 'https://facebook.com',
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache'
