@@ -1,28 +1,32 @@
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
+import messaging from '@react-native-firebase/messaging';
+import { Platform } from 'react-native';
 
 export async function getFCMToken() {
-  let token;
+  try {
+    // Check if we have permission on iOS (Android doesn't need this)
+    if (Platform.OS === 'ios') {
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    
-    if (finalStatus !== 'granted') {
-      throw new Error('Failed to get push token for push notification!');
+      if (!enabled) {
+        throw new Error('Las notificaciones no están habilitadas');
+      }
     }
 
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-  } else {
-    throw new Error('Must use physical device for Push Notifications');
+    // Get the FCM token
+    const fcmToken = await messaging().getToken();
+    if (!fcmToken) {
+      throw new Error('No se pudo obtener el token FCM');
+    }
+    
+    console.log('Token FCM obtenido:', fcmToken);
+    return fcmToken;
+  } catch (error) {
+    console.error('Error al obtener token FCM:', error);
+    throw new Error('No se pudo obtener el token de notificaciones');
   }
-
-  return token;
 }
 
 interface TokenRegistration {
